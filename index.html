@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
   <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
-  <title>7. Sınıf Sosyal Bilgiler, LGS, Kolej (Zor) &amp; Olimpiyat Stüdyosu (430 Soru)</title>
+  <title>Sosyal7 Arena — 7. Sınıf Sosyal Bilgiler, LGS, Kolej Zor &amp; Olimpiyat (430 Soru)</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -497,7 +497,7 @@
       <div class="brand">
         <div class="brand-icon">7.S</div>
         <div>
-          <h1>7. Sınıf Sosyal Bilgiler &amp; LGS Hazırlık Stüdyosu</h1>
+          <h1>Sosyal7 Arena <span style="font-size:0.74rem;background:rgba(253,230,138,0.22);border:1px solid rgba(253,230,138,0.6);padding:0.12rem 0.5rem;border-radius:999px;vertical-align:middle;">sosyal7-arena</span></h1>
           <p>250 Sosyal Bilgiler + 100 LGS (5 Test) + 40 Kolej Zor + 40 Olimpiyat Sorusu (Toplam 430 Soru)</p>
         </div>
       </div>
@@ -598,6 +598,36 @@
         <div class="card-header">
           <h2 class="card-title">⚔️ Arkadaşlarla Karşılıklı Test Odası</h2>
           <span class="badge" id="duelConnectionBadge">● Oda Sistemi Hazır</span>
+        </div>
+
+        <div style="background:#f8fbff;border:1.5px dashed rgba(29,78,216,0.3);border-radius:12px;padding:0.8rem 1rem;margin-bottom:1rem;">
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0.5rem;">
+            <div>
+              <strong style="font-size:0.86rem;color:var(--primary-dark);">🔥 Yeni Proje Firebase Bağlantı Ayarları</strong>
+              <div style="font-size:0.76rem;color:var(--text-muted);" id="activeFbProjectInfo">Aktif Proje:  (Düğüm: sosyal7_proje_*)</div>
+            </div>
+            <button type="button" class="btn" id="toggleFbConfigBtn" style="padding:0.4rem 0.75rem;font-size:0.78rem;">⚙️ Firebase URL/Key Düzenle</button>
+          </div>
+          <div id="fbConfigEditor" style="display:none;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid rgba(29,78,216,0.14);">
+            <div class="two-col" style="gap:0.65rem;">
+              <div class="form-group" style="margin-bottom:0.4rem;">
+                <label for="fbCustomDbUrl">Database URL:</label>
+                <input type="text" id="fbCustomDbUrl" placeholder="https://...firebasedatabase.app" />
+              </div>
+              <div class="form-group" style="margin-bottom:0.4rem;">
+                <label for="fbCustomProjectId">Project ID:</label>
+                <input type="text" id="fbCustomProjectId" placeholder="proje-id" />
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0.5rem;">
+              <label for="fbCustomApiKey">API Key:</label>
+              <input type="text" id="fbCustomApiKey" placeholder="AIza..." />
+            </div>
+            <div style="display:flex;gap:0.45rem;flex-wrap:wrap;">
+              <button type="button" class="btn btn-primary" id="saveFbConfigBtn" style="padding:0.42rem 0.8rem;font-size:0.78rem;">Bağlantıyı Kaydet ve Yeniden Bağlan</button>
+              <button type="button" class="btn" id="resetFbConfigBtn" style="padding:0.42rem 0.8rem;font-size:0.78rem;">Varsayılana Dön</button>
+            </div>
+          </div>
         </div>
 
         <div class="two-col" style="margin-bottom:1rem;">
@@ -790,25 +820,115 @@
       { id: "u7", short: "7. Ünite: Küresel Bağlantılar", desc: "Uluslararası kuruluşlar, Türk dünyası, dış ticaret ve küresel sorunlar", count: 35 }
     ];
 
-    /* FİREBASE BAĞLANTISI (ARKADAŞLARLA CANLI DÜELLO İÇİN) */
+    /* BAĞIMSIZ YENİ FİREBASE PROJESİ BAĞLANTISI */
+    // Kendi Firebase Console'unda oluşturduğun YENİ projenin bilgilerini buraya gir
+    // veya uygulama içindeki "Firebase URL/Key Düzenle" panelinden kaydedebilirsin.
     const FIREBASE_CONFIG = {
-      apiKey: "AIzaSyC1b-9fvfKl7MEnith-SpFxRw-18ms8voI",
-      authDomain: "auzef-tarih-studyosu.firebaseapp.com",
-      databaseURL: "https://auzef-tarih-studyosu-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "auzef-tarih-studyosu",
-      storageBucket: "auzef-tarih-studyosu.firebasestorage.app",
-      messagingSenderId: "984516634464",
-      appId: "1:984516634464:web:4f1fc3ef6349864475a005"
+      apiKey: "AIzaSyBhUyzlWcFreFtCOqg6TzpcRBbI15HNcDo",
+      authDomain: "sosyal7-arena.firebaseapp.com",
+      databaseURL: "https://sosyal7-arena-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "sosyal7-arena",
+      storageBucket: "sosyal7-arena.firebasestorage.app",
+      messagingSenderId: "852033792016",
+      appId: "1:852033792016:web:cac6fef0dff6aefa674295"
     };
 
     let fbDb = null;
-    try {
-      if (window.firebase && !firebase.apps.length) {
-        firebase.initializeApp(FIREBASE_CONFIG);
-        fbDb = firebase.database();
+    let fbConnected = false;
+
+    function hasValidFirebaseConfig(cfg) {
+      return Boolean(
+        cfg &&
+        typeof cfg.apiKey === "string" && cfg.apiKey.trim().length > 10 &&
+        typeof cfg.databaseURL === "string" && cfg.databaseURL.trim().startsWith("https://") &&
+        typeof cfg.projectId === "string" && cfg.projectId.trim().length > 1
+      );
+    }
+
+    function setFirebaseStatus(isOnline, detailText) {
+      fbConnected = Boolean(isOnline);
+      const badge = document.getElementById("duelConnectionBadge");
+      const projInfo = document.getElementById("activeFbProjectInfo");
+      if (projInfo) {
+        projInfo.textContent = hasValidFirebaseConfig(FIREBASE_CONFIG)
+          ? `Bağımsız Yeni Proje: ${FIREBASE_CONFIG.projectId} (Düğüm: sosyal7_proje_*)`
+          : "Yeni Firebase Projesi Henüz Tanımlanmadı — Yerel Mod Aktif (Ayarlardan yeni proje bilgilerini gir)";
       }
-    } catch (e) {
-      fbDb = null;
+      if (badge) {
+        badge.textContent = isOnline
+          ? `● Yeni Firebase Projesi Bağlı (${detailText || "Canlı"})`
+          : `● Yerel Mod (${detailText || "Yeni Proje Bilgisi Bekleniyor"})`;
+        badge.style.background = isOnline ? "#dcfce7" : "#fef3c7";
+        badge.style.color = isOnline ? "#166534" : "#92400e";
+        badge.style.borderColor = isOnline ? "#22c55e" : "#f59e0b";
+      }
+    }
+
+    function connectStandaloneFirebase() {
+      if (!hasValidFirebaseConfig(FIREBASE_CONFIG)) {
+        fbDb = null;
+        setFirebaseStatus(false, "Yeni Proje Bilgisi Girilmedi");
+        return;
+      }
+      try {
+        if (window.firebase) {
+          const prevApps = [...firebase.apps];
+          Promise.all(prevApps.map((a) => a.delete())).then(() => {
+            const appName = "bagimsiz_yeni_proje_" + Date.now();
+            const app = firebase.initializeApp(FIREBASE_CONFIG, appName);
+            fbDb = app.database();
+            fbDb.ref(".info/connected").on("value", (snap) => {
+              if (snap.val() === true) {
+                setFirebaseStatus(true, FIREBASE_CONFIG.projectId);
+              } else {
+                setFirebaseStatus(false, "Bağlantı Bekleniyor");
+              }
+            });
+          }).catch(() => {
+            setFirebaseStatus(false, "Başlatma Hatası");
+          });
+        }
+      } catch (e) {
+        fbDb = null;
+        setFirebaseStatus(false, "Bağlantı Hatası");
+      }
+    }
+
+    function getUserFirebaseKey(nick) {
+      return (nick || "misafir").toLowerCase().trim().replace(/[.#$/\[\]]/g, "_").replace(/[^a-z0-9_ğüşöçıİĞÜŞÖÇ]/gi, "_").slice(0, 48) || "misafir";
+    }
+
+    async function syncProfileToFirebase() {
+      if (!fbDb || !hasValidFirebaseConfig(FIREBASE_CONFIG) || !userProfile || !userProfile.nickname || userProfile.nickname === "Öğrenci") return;
+      try {
+        const uKey = getUserFirebaseKey(userProfile.nickname);
+        await fbDb.ref("sosyal7_proje_kullanicilar/" + uKey).update({
+          nickname: userProfile.nickname,
+          avatar: userProfile.avatar || "🎓",
+          points: userProfile.points || 0,
+          totalSolved: userProfile.totalSolved || 0,
+          totalCorrect: userProfile.totalCorrect || 0,
+          byUnit: userProfile.byUnit || {},
+          byLgs: userProfile.byLgs || {},
+          updatedAt: Date.now()
+        });
+      } catch (e) {}
+    }
+
+    async function loadProfileFromFirebase(nick, pin) {
+      if (!fbDb || !hasValidFirebaseConfig(FIREBASE_CONFIG) || !nick) return null;
+      try {
+        const uKey = getUserFirebaseKey(nick);
+        const snap = await fbDb.ref("sosyal7_proje_kullanicilar/" + uKey).once("value");
+        if (snap.exists()) {
+          const remote = snap.val();
+          if (pin && remote.pin && remote.pin !== pin) {
+            return { error: "Bu kullanıcı adı için yeni Firebase projesindeki şifre hatalı!" };
+          }
+          return { data: remote };
+        }
+      } catch (e) {}
+      return null;
     }
 
     /* KULLANICI PROFİLİ VE İSTATİSTİK DURUMU */
@@ -824,7 +944,7 @@
     };
 
     function getStorageKey(nick) {
-      return "sinif7_sb_lgs_profile_" + (nick || "misafir").toLowerCase().replace(/[^a-z0-9_]/g, "_");
+      return "sosyal7_proje_profile_" + (nick || "misafir").toLowerCase().replace(/[^a-z0-9_]/g, "_");
     }
 
     function loadUserProfile(nick) {
@@ -841,9 +961,10 @@
     function saveUserProfile() {
       try {
         localStorage.setItem(getStorageKey(userProfile.nickname), JSON.stringify(userProfile));
-        localStorage.setItem("sinif7_last_user", userProfile.nickname);
+        localStorage.setItem("sosyal7_proje_last_user", userProfile.nickname);
       } catch (e) {}
       updateHeaderAndStats();
+      syncProfileToFirebase();
     }
 
     function getRankName(pts) {
@@ -902,7 +1023,7 @@
       document.getElementById("authModal").classList.add("open");
     });
 
-    document.getElementById("submitLoginBtn").addEventListener("click", () => {
+    document.getElementById("submitLoginBtn").addEventListener("click", async () => {
       const nick = document.getElementById("loginNickname").value.trim();
       const pin = document.getElementById("loginPin").value.trim();
       const avatar = document.getElementById("loginAvatar").value;
@@ -920,18 +1041,43 @@
           fb.textContent = "Bu kullanıcı adı için girilen şifre hatalı!";
           return;
         }
-        userProfile = { ...parsed, avatar };
+        userProfile = { ...parsed, pin, avatar };
       } else {
-        userProfile = {
-          nickname: nick,
-          pin,
-          avatar,
-          points: 0,
-          totalSolved: 0,
-          totalCorrect: 0,
-          byUnit: {},
-          byLgs: {}
-        };
+        const cloudRes = await loadProfileFromFirebase(nick, pin);
+        if (cloudRes && cloudRes.error) {
+          fb.textContent = cloudRes.error;
+          return;
+        }
+        if (cloudRes && cloudRes.data) {
+          userProfile = {
+            nickname: nick,
+            pin,
+            avatar: cloudRes.data.avatar || avatar,
+            points: cloudRes.data.points || 0,
+            totalSolved: cloudRes.data.totalSolved || 0,
+            totalCorrect: cloudRes.data.totalCorrect || 0,
+            byUnit: cloudRes.data.byUnit || {},
+            byLgs: cloudRes.data.byLgs || {}
+          };
+        } else {
+          userProfile = {
+            nickname: nick,
+            pin,
+            avatar,
+            points: 0,
+            totalSolved: 0,
+            totalCorrect: 0,
+            byUnit: {},
+            byLgs: {}
+          };
+        }
+      }
+
+      if (fbDb) {
+        try {
+          const uKey = getUserFirebaseKey(userProfile.nickname);
+          await fbDb.ref("sosyal7_proje_kullanicilar/" + uKey).update({ pin });
+        } catch (e) {}
       }
 
       saveUserProfile();
@@ -1202,7 +1348,7 @@
 
       if (fbDb) {
         try {
-          await fbDb.ref("sinif7_duello/" + code).set({
+          await fbDb.ref("sosyal7_proje_duello/" + code).set({
             hostName: userProfile.nickname,
             hostScore: 0,
             guestName: "",
@@ -1227,7 +1373,7 @@
 
       if (fbDb) {
         try {
-          const snap = await fbDb.ref("sinif7_duello/" + code).once("value");
+          const snap = await fbDb.ref("sosyal7_proje_duello/" + code).once("value");
           if (snap.exists()) {
             const data = snap.val();
             hostName = data.hostName || "Arkadaşın";
@@ -1236,7 +1382,7 @@
             if (Array.isArray(data.questionIds)) {
               loadedQuestions = data.questionIds.map((id) => allMap.get(id)).filter(Boolean);
             }
-            await fbDb.ref("sinif7_duello/" + code).update({
+            await fbDb.ref("sosyal7_proje_duello/" + code).update({
               guestName: userProfile.nickname,
               guestScore: 0
             });
@@ -1265,7 +1411,7 @@
 
     function listenDuelRoom(code, role) {
       if (!fbDb) return;
-      fbDb.ref("sinif7_duello/" + code).on("value", (snap) => {
+      fbDb.ref("sosyal7_proje_duello/" + code).on("value", (snap) => {
         if (!snap.exists()) return;
         const d = snap.val();
         if (role === "host") {
@@ -1380,7 +1526,7 @@
           if (fbDb && duelState.roomCode) {
             try {
               const field = duelState.role === "host" ? "hostScore" : "guestScore";
-              await fbDb.ref("sinif7_duello/" + duelState.roomCode).update({ [field]: duelState.myScore });
+              await fbDb.ref("sosyal7_proje_duello/" + duelState.roomCode).update({ [field]: duelState.myScore });
             } catch (e) {}
           }
 
@@ -1512,9 +1658,67 @@
       };
     })();
 
+
+    /* BAĞIMSIZ YENİ PROJE FİREBASE AYAR YÖNETİCİSİ */
+    (function initStandaloneFirebaseEditor() {
+      const FB_OVERRIDE_KEY = "sosyal7_proje_fb_override";
+      const toggleBtn = document.getElementById("toggleFbConfigBtn");
+      const editor = document.getElementById("fbConfigEditor");
+      const urlInput = document.getElementById("fbCustomDbUrl");
+      const pidInput = document.getElementById("fbCustomProjectId");
+      const keyInput = document.getElementById("fbCustomApiKey");
+
+      function applySavedOverride() {
+        try {
+          const raw = localStorage.getItem(FB_OVERRIDE_KEY);
+          if (!raw) return;
+          const ov = JSON.parse(raw);
+          if (ov.databaseURL) FIREBASE_CONFIG.databaseURL = ov.databaseURL;
+          if (ov.projectId) FIREBASE_CONFIG.projectId = ov.projectId;
+          if (ov.apiKey) FIREBASE_CONFIG.apiKey = ov.apiKey;
+          if (ov.projectId) {
+            FIREBASE_CONFIG.authDomain = ov.projectId + ".firebaseapp.com";
+            FIREBASE_CONFIG.storageBucket = ov.projectId + ".firebasestorage.app";
+          }
+        } catch (e) {}
+      }
+
+      applySavedOverride();
+      if (urlInput) urlInput.value = FIREBASE_CONFIG.databaseURL || "";
+      if (pidInput) pidInput.value = FIREBASE_CONFIG.projectId || "";
+      if (keyInput) keyInput.value = FIREBASE_CONFIG.apiKey || "";
+      setFirebaseStatus(false, hasValidFirebaseConfig(FIREBASE_CONFIG) ? "Bağlanıyor..." : "Yeni Proje Bilgisi Girilmedi");
+
+      if (toggleBtn && editor) {
+        toggleBtn.addEventListener("click", () => {
+          editor.style.display = editor.style.display === "none" ? "block" : "none";
+        });
+      }
+
+      document.getElementById("saveFbConfigBtn")?.addEventListener("click", () => {
+        const nextOv = {
+          databaseURL: (urlInput?.value || "").trim(),
+          projectId: (pidInput?.value || "").trim(),
+          apiKey: (keyInput?.value || "").trim()
+        };
+        localStorage.setItem(FB_OVERRIDE_KEY, JSON.stringify(nextOv));
+        applySavedOverride();
+        connectStandaloneFirebase();
+      });
+
+      document.getElementById("resetFbConfigBtn")?.addEventListener("click", () => {
+        localStorage.removeItem(FB_OVERRIDE_KEY);
+        window.location.reload();
+      });
+
+      if (hasValidFirebaseConfig(FIREBASE_CONFIG)) {
+        connectStandaloneFirebase();
+      }
+    })();
+
     /* BAŞLANGIÇ */
     (function init() {
-      const lastUser = localStorage.getItem("sinif7_last_user");
+      const lastUser = localStorage.getItem("sosyal7_proje_last_user");
       if (lastUser) {
         loadUserProfile(lastUser);
         document.getElementById("authModal").classList.remove("open");
@@ -1526,6 +1730,9 @@
       startLgsQuiz();
       startKolejQuiz();
       startOlimpiyatQuiz();
+      if (userProfile.nickname && userProfile.nickname !== "Öğrenci") {
+        syncProfileToFirebase();
+      }
     })();
   </script>
 </body>

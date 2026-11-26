@@ -1,7 +1,7 @@
 {
-  "name": "7. Sınıf Sosyal Bilgiler & LGS Hazırlık Stüdyosu",
-  "short_name": "7. Sınıf Sosyal",
-  "description": "7. Sınıf Sosyal Bilgiler (250 Soru), LGS Hazırlık (5 Deneme · 100 Soru), Kolej Zor (40 Soru) ve Olimpiyat (40 Soru) Platformu",
+  "name": "Sosyal7 Arena",
+  "short_name": "Sosyal7 Arena",
+  "description": "Sosyal7 Arena: 7. Sınıf Sosyal Bilgiler (250), LGS Hazırlık (100), Kolej Zor (40) ve Olimpiyat (40) — Canlı Düello & Bulut Profil",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f0f6ff",
