@@ -1,0 +1,21 @@
+{
+  "name": "7. Sınıf Sosyal Bilgiler & LGS Hazırlık Stüdyosu",
+  "short_name": "7. Sınıf Sosyal",
+  "description": "7. Sınıf Sosyal Bilgiler (250 Soru), LGS Hazırlık (5 Deneme · 100 Soru), Kolej Zor (40 Soru) ve Olimpiyat (40 Soru) Platformu",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f0f6ff",
+  "theme_color": "#1e3a8a",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
